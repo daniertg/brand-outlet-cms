@@ -12,6 +12,7 @@ class OutletApiController extends Controller
     public function nearest(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'brand_id' => 'required|exists:brands,id',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
@@ -19,7 +20,7 @@ class OutletApiController extends Controller
         $userLat = (float) $validated['latitude'];
         $userLon = (float) $validated['longitude'];
 
-        $outlets = Outlet::with('brand')->get();
+        $outlets = Outlet::with('brand')->where('brand_id', $validated['brand_id'])->get();
 
         if ($outlets->isEmpty()) {
             return response()->json([
